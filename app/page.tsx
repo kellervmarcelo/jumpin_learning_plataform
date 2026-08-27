@@ -28,8 +28,9 @@ const typescriptThumbnail = (
 );
 
 // Conteúdo estático de exemplo (design/vertex-home.png, seção "All Courses").
-// Sem Sanity ainda — nenhuma página de curso real existe, os hrefs só seguem
-// a estrutura de rota que a seção 8 do AGENTS.md já prevê para curso.
+// Sem Sanity ainda, não existe página de curso real — por isso nenhum card
+// tem `href`: CourseCard renderiza sem navegação em vez de linkar para uma
+// rota que ainda daria 404. Adicionar o `href` de volta quando a rota existir.
 const courses: CourseCardProps[] = [
   {
     title: "Next.js for Production",
@@ -37,7 +38,6 @@ const courses: CourseCardProps[] = [
     level: "Intermediate",
     duration: "18h 24m",
     modulesLabel: "12 modules",
-    href: "/courses/nextjs-for-production",
     thumbnail: nextjsThumbnail,
   },
   {
@@ -46,7 +46,6 @@ const courses: CourseCardProps[] = [
     level: "Beginner",
     duration: "10h 12m",
     modulesLabel: "8 modules",
-    href: "/courses/docker-essentials",
     thumbnail: dockerThumbnail,
   },
   {
@@ -55,7 +54,6 @@ const courses: CourseCardProps[] = [
     level: "Intermediate",
     duration: "14h 36m",
     modulesLabel: "10 modules",
-    href: "/courses/typescript-deep-dive",
     thumbnail: typescriptThumbnail,
   },
 ];
@@ -149,7 +147,7 @@ export default function Home() {
 
             <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
               {courses.map((course) => (
-                <CourseCard key={course.href} {...course} />
+                <CourseCard key={course.title} {...course} />
               ))}
             </div>
           </section>

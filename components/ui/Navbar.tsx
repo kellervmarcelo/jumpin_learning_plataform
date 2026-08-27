@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import Image from "next/image";
 import { ListIcon, XIcon, BellIcon, UserIcon } from "@phosphor-icons/react/dist/ssr";
 import { cn } from "@/lib/cn";
 
@@ -72,11 +71,17 @@ export function Navbar({ links, logoHref = "/", notifications, user, className }
 
           {user ? (
             user.imageSrc ? (
-              <Image
+              // <img> em vez de next/image: a origem do avatar é arbitrária
+              // (provedor de auth do usuário) e next/image exige que o host
+              // remoto esteja em `images.remotePatterns` no next.config.ts,
+              // o que travaria em runtime para qualquer host não previsto.
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
                 src={user.imageSrc}
                 alt={user.name}
                 width={36}
                 height={36}
+                loading="lazy"
                 className="h-9 w-9 flex-none rounded-full object-cover"
               />
             ) : (

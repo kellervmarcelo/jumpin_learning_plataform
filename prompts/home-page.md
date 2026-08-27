@@ -25,8 +25,8 @@ Implementar a home page (`app/page.tsx`) reproduzindo exatamente `design/vertex-
 3. **Sino de notificação sem contador/dropdown**: por ser presentational-only (seção 7 do AGENTS.md), é só um botão com ícone `BellIcon`, `aria-label="Notifications"`, sem badge de contagem nem menu (a imagem não mostra contador).
 4. **Logomarca "V" → "J"**: o Navbar já simplifica o ícone da marca (que na imagem é um glifo ilustrado) para um quadrado colorido com uma letra — decisão herdada da implementação anterior do design system, não da imagem pixel-a-pixel. Mantenho esse padrão e troco a letra de "V" para "J", já que agora o wordmark é "JumpIn".
 5. **Mesma troca em `/style-guide`**: a página do design system também tem "Vertex" hardcoded (o quadrado "V" solto do cabeçalho da página e a frase "...Vertex learning platform..."). Ajusto os dois para "J"/"JumpIn" para não deixar a marca inconsistente entre páginas — é a mesma instrução de troca de nome, só que já existente antes desta tarefa.
-6. **Card do meio (Docker)**: `CourseCard` já aceita um slot `thumbnail` para substituir o quadrado padrão. Uso esse slot para reproduzir os três thumbnails da imagem: quadrado preto "N" (na verdade já é o fallback padrão do componente), quadrado azul "TS" (thumbnail customizado, mesmo padrão visual do fallback só que com `bg-blue-600` pontual — não crio token novo, uso a paleta padrão do Tailwind só aqui por ser um logotipo de terceiro/ilustrativo, igual a imagem já foge da paleta Primary/Neutral nesse card) e um quadrado claro com emoji 🐳 para o whale do Docker (sem lib de logos de terceiros no projeto; emoji é a forma mais simples de não inventar um ícone que não existe no Phosphor).
-7. **Conteúdo estático dos 3 cursos**: copiado literalmente da imagem (títulos, descrições, nível, duração, nº de módulos). `href` de cada card aponta para `/courses/<slug>` (rota que ainda não existe — fora de escopo) só para não deixar link vazio/`#`, seguindo a estrutura de URL que a seção 8 do AGENTS.md já prevê para curso.
+6. **Card do meio (Docker)**: `CourseCard` já aceita um slot `thumbnail` para substituir o quadrado padrão. Uso esse slot para reproduzir os três thumbnails da imagem. ~~Versão original (revisada depois, ver "Fixes pós-revisão" no fim do arquivo): quadrado azul "TS" com `bg-blue-600` pontual e emoji 🐳 para o Docker.~~
+7. **Conteúdo estático dos 3 cursos**: copiado literalmente da imagem (títulos, descrições, nível, duração, nº de módulos). ~~`href` de cada card apontava para `/courses/<slug>` — revisado, ver "Fixes pós-revisão".~~
 8. **Selo "INTELLIGENT LEARNING"**: não é nenhuma das 3 variantes de `Badge` (video/lesson/popular são preenchidas; este selo é contornado, fundo claro). Construo inline na página com os tokens existentes (`bg-primary-100 text-primary-500 border border-primary-200`) em vez de adicionar uma 4ª variante ao `Badge` compartilhado só para um uso único nesta página.
 9. **Busca grande do herói**: reaproveito `Input` (`variant="search"`, `shortcut="⌘K"`), só aumentando altura/radius via `className` (`h-14 rounded-xl shadow-sm`) — o componente já foi desenhado para aceitar essa composição (`cn()` faz o merge), então não crio um input novo.
 10. **Faixa decorativa de barras no rodapé**: elemento puramente ilustrativo (barras com gradiente laranja, seção final da imagem). Não existe em nenhum componente do design system nem faz sentido virar um — implemento como marcação local ao `app/page.tsx`, `aria-hidden="true"`, sem texto/semântica, só CSS com os tokens de cor `primary-200`/`primary-300` já existentes.
@@ -68,7 +68,7 @@ Implementar a home page (`app/page.tsx`) reproduzindo exatamente `design/vertex-
 - Hero: título/subtítulo/busca/botão mantêm-se centralizados e com `max-w` fluido; título já usa `clamp()` herdado de `type-display-1`.
 - Grade de cursos: 1 coluna no mobile, 2 em `sm`, 3 em `lg` (mesmo padrão de `grid-cols-1 sm:grid-cols-2 lg:grid-cols-3` já usado no style-guide).
 - Cabeçalho da seção "All Courses": título e link empilham no mobile (`flex-col sm:flex-row sm:items-center sm:justify-between`).
-- Faixa de barras: `overflow-hidden` no contêiner pai para nunca causar scroll horizontal; barras usam `flex-1`/`min-w-0` para se redistribuir em telas estreitas.
+- Faixa de barras: barras usam `flex-1`/`min-w-0` para se redistribuir em telas estreitas sem estourar a largura (ver "Fixes pós-revisão" — a implementação usa uma máscara vertical (`mask-image`) para o esmaecimento, não `overflow-hidden`, que nunca chegou a ser necessário porque as barras já não extrapolam o contêiner).
 - Navbar mobile já resolvido pelo componente existente (menu hambúrguer); sino + avatar continuam visíveis também no mobile, à direita do botão de menu.
 
 ## Considerações de segurança
@@ -80,7 +80,7 @@ Página 100% apresentacional: sem fetch de rede, sem token, sem dado de usuário
 - `app/page.tsx` reproduz visualmente `design/vertex-home.png` (layout, espaçamento, tipografia, cores) com "JumpIn" no lugar de "Vertex" em todo texto de marca.
 - Todos os elementos de UI vêm de `components/ui` (Button, Input, CourseCard, Navbar) exceto o selo "INTELLIGENT LEARNING" e a faixa decorativa de barras, que são específicos desta página (seção 3 do AGENTS.md: reutilizar antes de criar).
 - `Navbar` com as novas props `notifications`/`user` continua funcionando sem elas (uso em `/style-guide` inalterado visualmente, exceto a marca).
-- Nenhuma cor/radius/sombra/fonte escrita fora dos tokens do Tailwind já definidos em `@theme`, com a única exceção documentada do azul do card Docker/TS (decisão 6).
+- Nenhuma cor/radius/sombra/fonte escrita fora dos tokens do Tailwind já definidos em `@theme`, com a exceção das cores oficiais de marca (Next.js/Docker/TypeScript) nos thumbnails — ver "Fixes pós-revisão".
 - `npx tsc --noEmit`, `npm run lint` e `npm run build` passam sem erro.
 - Página não gera scroll horizontal entre 360px e desktop largo.
 
@@ -100,3 +100,11 @@ Página 100% apresentacional: sem fetch de rede, sem token, sem dado de usuário
 5. Reduzir a janela para mobile (~360–400px) e confirmar que nada quebra nem gera scroll horizontal, e que a grade de cursos empilha em 1 coluna.
 6. Abrir `http://localhost:3000/style-guide` e confirmar que a marca também mudou para "JumpIn"/"J" e que o resto da página segue igual.
 7. Navegar só com Tab pela home e confirmar foco visível em: link do logo, links do navbar, sino, avatar (se focável), botão "Explore Courses", campo de busca, link "View all courses", cada `CourseCard`.
+
+## Fixes pós-revisão (comentários do CodeRabbit na PR #1)
+
+Este prompt documentava a versão original da home page. Depois de aberta a PR, três achados da revisão automática foram verificados contra o código e corrigidos:
+
+1. **Links dos 3 `CourseCard` levavam a 404** (`/courses/<slug>` não existe — não há Sanity nem rota de curso ainda). Fix: `CourseCardProps.href` virou opcional; sem `href`, o componente renderiza um `<div>` em vez de `<Link>` (mesmo visual, sem navegação nem hover de "link"). A home page agora não passa `href` para os 3 cursos de exemplo — volta a ser obrigatório reintroduzi-lo quando a página de curso existir.
+2. **Avatar do usuário via `next/image` quebraria em runtime**: `next/image` exige que o host da imagem remota esteja em `images.remotePatterns` (`next.config.ts`), que está vazio. Como a origem real do avatar (provedor de auth, ainda não integrado) é desconhecida hoje, trocamos `<Image>` por `<img>` simples no avatar do `Navbar` — perde a otimização automática do Next, aceitável para um avatar de 36px de qualquer host.
+3. **Este prompt estava desatualizado** em relação ao código: a decisão 6 ainda descrevia emoji 🐳 e `bg-blue-600` (substituídos por logos reais via `@icons-pack/react-simple-icons` numa correção posterior, antes da revisão), e a seção de responsividade citava um `overflow-hidden` que nunca existiu na implementação (o esmaecimento da faixa de barras sempre usou `mask-image`). Texto acima já ajustado para refletir o estado real.
