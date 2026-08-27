@@ -2,8 +2,10 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { ListIcon, XIcon, BellIcon, UserIcon } from "@phosphor-icons/react/dist/ssr";
+import { Show, SignInButton, SignUpButton, UserButton } from "@clerk/nextjs";
+import { ListIcon, XIcon, BellIcon } from "@phosphor-icons/react/dist/ssr";
 import { cn } from "@/lib/cn";
+import { Button } from "./Button";
 
 export type NavLink = {
   label: string;
@@ -11,24 +13,17 @@ export type NavLink = {
   active?: boolean;
 };
 
-export type NavbarUser = {
-  name: string;
-  imageSrc?: string;
-};
-
 export type NavbarProps = {
   links: NavLink[];
   logoHref?: string;
   /** Mostra o sino de notificações — presentational-only (seção 7 do AGENTS.md), sem contador/menu. */
   notifications?: boolean;
-  /** Avatar do usuário logado; sem `imageSrc` cai num ícone de usuário genérico. */
-  user?: NavbarUser;
   className?: string;
 };
 
 // 13 — Navigation. Sem referência mobile: abaixo de `md` os links recolhem
 // atrás de um botão de menu para não espremer o logo.
-export function Navbar({ links, logoHref = "/", notifications, user, className }: NavbarProps) {
+export function Navbar({ links, logoHref = "/", notifications, className }: NavbarProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   return (
@@ -69,31 +64,24 @@ export function Navbar({ links, logoHref = "/", notifications, user, className }
             </button>
           ) : null}
 
-          {user ? (
-            user.imageSrc ? (
-              // <img> em vez de next/image: a origem do avatar é arbitrária
-              // (provedor de auth do usuário) e next/image exige que o host
-              // remoto esteja em `images.remotePatterns` no next.config.ts,
-              // o que travaria em runtime para qualquer host não previsto.
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
-                src={user.imageSrc}
-                alt={user.name}
-                width={36}
-                height={36}
-                loading="lazy"
-                className="h-9 w-9 flex-none rounded-full object-cover"
-              />
-            ) : (
-              <span
-                role="img"
-                aria-label={user.name}
-                className="flex h-9 w-9 flex-none items-center justify-center rounded-full bg-neutral-100 text-neutral-500"
-              >
-                <UserIcon size={18} weight="fill" aria-hidden="true" />
-              </span>
-            )
-          ) : null}
+          <Show when="signed-out">
+            <div className="hidden items-center gap-2 sm:flex">
+              <SignInButton mode="modal">
+                <Button variant="tertiary" className="h-9 px-3">
+                  Sign in
+                </Button>
+              </SignInButton>
+              <SignUpButton mode="modal">
+                <Button variant="primary" className="h-9 px-3">
+                  Sign up
+                </Button>
+              </SignUpButton>
+            </div>
+          </Show>
+
+          <Show when="signed-in">
+            <UserButton />
+          </Show>
 
           <button
             type="button"

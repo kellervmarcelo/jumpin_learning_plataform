@@ -103,7 +103,6 @@ export default function Home() {
             { label: "My Learning", href: "/my-learning" },
           ]}
           notifications
-          user={{ name: "Learner" }}
         />
 
         <main className="flex flex-1 flex-col">
