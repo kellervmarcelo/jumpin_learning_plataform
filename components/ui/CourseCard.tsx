@@ -1,6 +1,6 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
-import { GaugeIcon, ClockIcon, StackIcon } from "@phosphor-icons/react/dist/ssr";
+import { ChartBarIcon, ClockIcon, FolderIcon } from "@phosphor-icons/react/dist/ssr";
 import { cn } from "@/lib/cn";
 
 export type CourseCardProps = {
@@ -54,7 +54,7 @@ export function CourseCard({
       <p className="type-body text-neutral-500">{description}</p>
       <div className="mt-auto flex flex-wrap items-center gap-4 type-small text-neutral-500">
         <span className="inline-flex items-center gap-1.5">
-          <GaugeIcon size={14} aria-hidden="true" />
+          <ChartBarIcon size={14} aria-hidden="true" />
           {level}
         </span>
         <span className="inline-flex items-center gap-1.5">
@@ -62,7 +62,7 @@ export function CourseCard({
           {duration}
         </span>
         <span className="inline-flex items-center gap-1.5">
-          <StackIcon size={14} aria-hidden="true" />
+          <FolderIcon size={14} aria-hidden="true" />
           {modulesLabel}
         </span>
       </div>

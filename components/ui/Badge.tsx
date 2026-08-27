@@ -9,11 +9,12 @@ export type BadgeProps = {
   className?: string;
 };
 
-// 09 — Badges/Tags.
+// 09 — Badges/Tags. Pílulas de fundo claro + texto colorido (conferido por
+// amostragem de pixel no PNG de referência — não são fundos sólidos).
 const variantStyles: Record<BadgeVariant, string> = {
-  video: "bg-neutral-900 text-white",
-  lesson: "bg-neutral-100 text-neutral-700",
-  popular: "bg-primary-500 text-white",
+  video: "bg-primary-100 text-primary-500",
+  lesson: "bg-indigo-50 text-indigo-700",
+  popular: "bg-primary-100 text-primary-500",
 };
 
 export function Badge({ variant, children, className }: BadgeProps) {
