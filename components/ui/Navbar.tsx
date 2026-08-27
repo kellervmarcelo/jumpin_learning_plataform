@@ -65,7 +65,7 @@ export function Navbar({ links, logoHref = "/", notifications, className }: Navb
           ) : null}
 
           <Show when="signed-out">
-            <div className="hidden items-center gap-2 sm:flex">
+            <div className="hidden items-center gap-2 md:flex">
               <SignInButton mode="modal">
                 <Button variant="tertiary" className="h-9 px-3">
                   Sign in
@@ -112,6 +112,21 @@ export function Navbar({ links, logoHref = "/", notifications, className }: Navb
               {link.label}
             </Link>
           ))}
+
+          <Show when="signed-out">
+            <div className="mt-2 flex items-center gap-2 border-t border-neutral-200 pt-3">
+              <SignInButton mode="modal">
+                <Button variant="tertiary" className="h-9 flex-1 px-3" onClick={() => setIsMenuOpen(false)}>
+                  Sign in
+                </Button>
+              </SignInButton>
+              <SignUpButton mode="modal">
+                <Button variant="primary" className="h-9 flex-1 px-3" onClick={() => setIsMenuOpen(false)}>
+                  Sign up
+                </Button>
+              </SignUpButton>
+            </div>
+          </Show>
         </nav>
       ) : null}
     </header>
