@@ -1,6 +1,6 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
-import { GaugeIcon, ClockIcon, StackIcon } from "@phosphor-icons/react/dist/ssr";
+import { ChartBarIcon, ClockIcon, FolderIcon } from "@phosphor-icons/react/dist/ssr";
 import { cn } from "@/lib/cn";
 
 export type CourseCardProps = {
@@ -14,7 +14,9 @@ export type CourseCardProps = {
   modulesLabel: string;
   /** Slot da miniatura; se omitido, cai na inicial do título sobre um quadrado neutro. */
   thumbnail?: ReactNode;
-  href: string;
+  /** Sem página de curso real ainda (ex.: catálogo vindo do Sanity), o card
+   * renderiza sem navegação (`<div>`) em vez de linkar para uma rota inexistente. */
+  href?: string;
   className?: string;
 };
 
@@ -31,15 +33,8 @@ export function CourseCard({
 }: CourseCardProps) {
   const initial = title.charAt(0).toUpperCase();
 
-  return (
-    <Link
-      href={href}
-      className={cn(
-        "group flex flex-col gap-4 rounded-lg border border-neutral-200 bg-white p-4 shadow-sm transition-shadow hover:shadow-md",
-        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-400 focus-visible:ring-offset-2",
-        className,
-      )}
-    >
+  const content = (
+    <>
       <div className="flex items-start gap-3">
         {thumbnail ?? (
           <span
@@ -49,12 +44,14 @@ export function CourseCard({
             {initial}
           </span>
         )}
-        <h3 className="type-heading-3 text-neutral-900 group-hover:text-primary-500">{title}</h3>
+        <h3 className={cn("type-heading-3 text-neutral-900", href && "group-hover:text-primary-500")}>
+          {title}
+        </h3>
       </div>
       <p className="type-body text-neutral-500">{description}</p>
       <div className="mt-auto flex flex-wrap items-center gap-4 type-small text-neutral-500">
         <span className="inline-flex items-center gap-1.5">
-          <GaugeIcon size={14} aria-hidden="true" />
+          <ChartBarIcon size={14} aria-hidden="true" />
           {level}
         </span>
         <span className="inline-flex items-center gap-1.5">
@@ -62,10 +59,32 @@ export function CourseCard({
           {duration}
         </span>
         <span className="inline-flex items-center gap-1.5">
-          <StackIcon size={14} aria-hidden="true" />
+          <FolderIcon size={14} aria-hidden="true" />
           {modulesLabel}
         </span>
       </div>
+    </>
+  );
+
+  const sharedClassName = cn(
+    "group flex flex-col gap-4 rounded-lg border border-neutral-200 bg-white p-4 shadow-sm",
+    className,
+  );
+
+  if (!href) {
+    return <div className={sharedClassName}>{content}</div>;
+  }
+
+  return (
+    <Link
+      href={href}
+      className={cn(
+        sharedClassName,
+        "transition-shadow hover:shadow-md",
+        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-400 focus-visible:ring-offset-2",
+      )}
+    >
+      {content}
     </Link>
   );
 }

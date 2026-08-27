@@ -4,13 +4,13 @@ import { useState, type ReactNode } from "react";
 import {
   BellIcon,
   MagnifyingGlassIcon,
-  PlayIcon,
+  PlayCircleIcon,
   FileTextIcon,
-  BookmarkSimpleIcon,
+  BookmarkIcon,
   ChartBarIcon,
   ClockIcon,
   UserIcon,
-  ArrowRightIcon,
+  CaretRightIcon,
   ArrowSquareOutIcon,
   EyeIcon,
   SquaresFourIcon,
@@ -104,13 +104,13 @@ const shadowScale = [
 const iconSet: { name: string; icon: PhosphorIcon }[] = [
   { name: "Bell", icon: BellIcon },
   { name: "Search", icon: MagnifyingGlassIcon },
-  { name: "Play", icon: PlayIcon },
+  { name: "Play", icon: PlayCircleIcon },
   { name: "Document", icon: FileTextIcon },
-  { name: "Bookmark", icon: BookmarkSimpleIcon },
+  { name: "Bookmark", icon: BookmarkIcon },
   { name: "Chart", icon: ChartBarIcon },
   { name: "Clock", icon: ClockIcon },
   { name: "User", icon: UserIcon },
-  { name: "Arrow", icon: ArrowRightIcon },
+  { name: "Chevron", icon: CaretRightIcon },
 ];
 
 const principles = [
@@ -135,11 +135,11 @@ export default function StyleGuidePage() {
       <main className="mx-auto flex w-full max-w-6xl flex-col gap-8 px-4 py-10 sm:px-6">
         <header className="flex flex-col gap-3">
           <span aria-hidden="true" className="flex h-12 w-12 items-center justify-center rounded-md bg-primary-500 type-heading-1 font-bold text-white">
-            V
+            J
           </span>
           <h1 className="type-display-1 text-neutral-900">Design System</h1>
           <p className="type-body-lg max-w-2xl text-neutral-500">
-            A unified design language for the Vertex learning platform. Clean, modern and
+            A unified design language for the JumpIn learning platform. Clean, modern and
             focused on clarity, consistency and intuitive learning experiences.
           </p>
           <span className="type-small text-neutral-500">Version 1.0 · Implementado em JumpIn</span>
@@ -301,7 +301,7 @@ export default function StyleGuidePage() {
                 <Button variant="tertiary" icon={ArrowSquareOutIcon}>
                   View Lesson
                 </Button>
-                <Button variant="text" icon={PlayIcon}>
+                <Button variant="text" icon={PlayCircleIcon}>
                   Watch Video
                 </Button>
               </div>
@@ -318,7 +318,7 @@ export default function StyleGuidePage() {
                 <Button variant="tertiary" icon={ArrowSquareOutIcon} disabled>
                   View Lesson
                 </Button>
-                <Button variant="text" icon={PlayIcon} disabled>
+                <Button variant="text" icon={PlayCircleIcon} disabled>
                   Watch Video
                 </Button>
               </div>

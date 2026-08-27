@@ -7,7 +7,7 @@ export { ProgressBar, type ProgressBarProps } from "./ProgressBar";
 export { CourseCard, type CourseCardProps } from "./CourseCard";
 export { LessonCard, type LessonCardProps } from "./LessonCard";
 export { ResourceCard, type ResourceCardProps } from "./ResourceCard";
-export { Navbar, type NavbarProps, type NavLink } from "./Navbar";
+export { Navbar, type NavbarProps, type NavLink, type NavbarUser } from "./Navbar";
 export { Breadcrumbs, type BreadcrumbsProps, type BreadcrumbItem } from "./Breadcrumbs";
 export { Pagination, type PaginationProps } from "./Pagination";
 export type { PhosphorIcon } from "./types";

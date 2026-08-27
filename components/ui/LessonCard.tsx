@@ -1,4 +1,4 @@
-import { PlayIcon, ArrowSquareOutIcon } from "@phosphor-icons/react/dist/ssr";
+import { PlayCircleIcon, ArrowSquareOutIcon } from "@phosphor-icons/react/dist/ssr";
 import { Badge, type BadgeVariant } from "./Badge";
 import { Button } from "./Button";
 import { cn } from "@/lib/cn";
@@ -21,7 +21,7 @@ const variantConfig: Record<
   LessonCardProps["variant"],
   { badgeVariant: BadgeVariant; actionIcon: PhosphorIcon }
 > = {
-  video: { badgeVariant: "video", actionIcon: PlayIcon },
+  video: { badgeVariant: "video", actionIcon: PlayCircleIcon },
   lesson: { badgeVariant: "lesson", actionIcon: ArrowSquareOutIcon },
 };
 

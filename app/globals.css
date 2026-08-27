@@ -25,6 +25,11 @@
   /* Semântico extra — não vem da paleta da imagem, ver prompts/design-system.md */
   --color-success: #22c55e;
 
+  /* Acento do badge "Lesson" (seção 09) — cor amostrada do próprio PNG de
+   * referência, não faz parte da paleta Primary/Neutral da seção 01. */
+  --color-indigo-50: #eef2ff;
+  --color-indigo-700: #4338ca;
+
   /* Fontes — variáveis preenchidas por next/font em app/layout.tsx */
   --font-display: var(--font-playfair), Georgia, "Times New Roman", serif;
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;

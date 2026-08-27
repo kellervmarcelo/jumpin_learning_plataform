@@ -1,5 +1,5 @@
 import {
-  CircleIcon,
+  CircleNotchIcon,
   CheckCircleIcon,
   PlayCircleIcon,
   LockSimpleIcon,
@@ -20,8 +20,8 @@ export type StatusIndicatorProps = {
 // 10 — Status/Indicators. Cada estado tem forma de ícone própria (não só
 // cor), e o rótulo de texto é sempre exibido junto para leitores de tela.
 const config: Record<StatusKind, { icon: PhosphorIcon; weight: IconWeight; color: string }> = {
-  "in-progress": { icon: CircleIcon, weight: "regular", color: "text-neutral-500" },
-  completed: { icon: CheckCircleIcon, weight: "fill", color: "text-success" },
+  "in-progress": { icon: CircleNotchIcon, weight: "bold", color: "text-primary-500" },
+  completed: { icon: CheckCircleIcon, weight: "regular", color: "text-success" },
   "now-playing": { icon: PlayCircleIcon, weight: "fill", color: "text-primary-500" },
   locked: { icon: LockSimpleIcon, weight: "regular", color: "text-neutral-500" },
 };
