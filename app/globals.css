@@ -1,0 +1,104 @@
+@import "tailwindcss";
+
+/* ---------------------------------------------------------------------- *
+ * Vertex Design System — tokens (design/vertex-designsystem.png)
+ * Tailwind v4 "CSS-first" config: cada variável abaixo vira utilitário
+ * (ex.: --color-primary-500 -> bg-primary-500/text-primary-500/border-primary-500).
+ * ---------------------------------------------------------------------- */
+@theme {
+  /* 01 — Cores: Primary */
+  --color-primary-500: #f97316;
+  --color-primary-400: #fb923c;
+  --color-primary-300: #fdba74;
+  --color-primary-200: #fed7aa;
+  --color-primary-100: #ffeee5;
+
+  /* 01 — Cores: Neutral (só estes degraus existem — não usar neutral-400/600/800) */
+  --color-neutral-900: #0f172a;
+  --color-neutral-700: #334155;
+  --color-neutral-500: #64748b;
+  --color-neutral-300: #cbd5e1;
+  --color-neutral-200: #e2e8f0;
+  --color-neutral-100: #f1f5f9;
+  --color-neutral-50: #fafafc;
+
+  /* Semântico extra — não vem da paleta da imagem, ver prompts/design-system.md */
+  --color-success: #22c55e;
+
+  /* Fontes — variáveis preenchidas por next/font em app/layout.tsx */
+  --font-display: var(--font-playfair), Georgia, "Times New Roman", serif;
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+
+  /* 03 — Escala tipográfica (tamanho + altura de linha pareada) */
+  --text-display-1: clamp(2rem, 1.4rem + 3vw, 3rem); /* 32px -> 48px */
+  --text-display-1--line-height: 1.15;
+  --text-display-2: clamp(1.75rem, 1.45rem + 1.5vw, 2.25rem); /* 28px -> 36px */
+  --text-display-2--line-height: 1.2;
+  --text-heading-1: clamp(1.375rem, 1.225rem + 0.75vw, 1.75rem); /* 22px -> 28px */
+  --text-heading-1--line-height: 1.28;
+  --text-heading-2: 1.375rem; /* 22px */
+  --text-heading-2--line-height: 1.9rem; /* 30px */
+  --text-heading-3: 1.125rem; /* 18px */
+  --text-heading-3--line-height: 1.625rem; /* 26px */
+  --text-body-lg: 1rem; /* 16px */
+  --text-body-lg--line-height: 1.5rem; /* 24px */
+  --text-body: 0.875rem; /* 14px */
+  --text-body--line-height: 1.25rem; /* 20px */
+  --text-small: 0.75rem; /* 12px */
+  --text-small--line-height: 1rem; /* 16px */
+
+  /* 05 — Radius (substitui a escala padrão do Tailwind pela da Vertex) */
+  --radius-xs: 4px;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+
+  /* 05 — Sombras */
+  --shadow-sm: 0 1px 2px 0 rgba(15, 23, 42, 0.05);
+  --shadow-md: 0 4px 12px -2px rgba(15, 23, 42, 0.08);
+  --shadow-lg: 0 12px 24px -4px rgba(15, 23, 42, 0.1);
+  --shadow-xl: 0 20px 40px -8px rgba(15, 23, 42, 0.12);
+}
+
+/* Classes compostas para a escala tipográfica: cada linha da seção 03 já
+ * junta fonte + tamanho + peso num único nome, evitando repetir a combinação
+ * em cada componente. Continuam 100% baseadas nos tokens acima. */
+@layer components {
+  .type-display-1 {
+    @apply font-display text-display-1 font-bold;
+  }
+  .type-display-2 {
+    @apply font-display text-display-2 font-bold;
+  }
+  .type-heading-1 {
+    @apply font-sans text-heading-1 font-semibold;
+  }
+  .type-heading-2 {
+    @apply font-sans text-heading-2 font-semibold;
+  }
+  .type-heading-3 {
+    @apply font-sans text-heading-3 font-medium;
+  }
+  .type-body-lg {
+    @apply font-sans text-body-lg font-normal;
+  }
+  .type-body {
+    @apply font-sans text-body font-normal;
+  }
+  .type-small {
+    @apply font-sans text-small font-normal;
+  }
+}
+
+/* A referência só define tema claro — sem variante escura por enquanto. */
+:root {
+  --background: var(--color-neutral-50);
+  --foreground: var(--color-neutral-900);
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans);
+}
