@@ -1,9 +1,13 @@
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+#
+# Monorepo com dois workspaces standalone (web/, studio/ — seção 5 do
+# AGENTS.md), cada um com seu próprio node_modules/build output. Padrões
+# usam ** em vez de / para casar em qualquer nível.
 
 # dependencies
-/node_modules
-/.pnp
-.pnp.*
+**/node_modules
+**/.pnp
+**/.pnp.*
 .yarn/*
 !.yarn/patches
 !.yarn/plugins
@@ -11,14 +15,20 @@
 !.yarn/versions
 
 # testing
-/coverage
+**/coverage
 
-# next.js
-/.next/
-/out/
+# next.js (web/)
+web/.next/
+web/out/
+web/next-env.d.ts
+
+# sanity studio (studio/)
+studio/dist/
+studio/.sanity/
+studio/schema.json
 
 # production
-/build
+**/build
 
 # misc
 .DS_Store
@@ -30,12 +40,13 @@ yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 
-# env files (can opt-in for committing if needed)
-.env*
+# env files (canonical list lives in each workspace's .env.example)
+**/.env*
+!web/.env.example
+!studio/.env.example
 
 # vercel
 .vercel
 
 # typescript
-*.tsbuildinfo
-next-env.d.ts
+**/*.tsbuildinfo
