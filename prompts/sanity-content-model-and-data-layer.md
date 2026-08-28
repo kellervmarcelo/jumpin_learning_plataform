@@ -48,13 +48,13 @@ Fora de escopo (não entra aqui): `video`, o documento de contexto do agente, `p
 `app/studio/`, `sanity/`, `sanity.config.ts`, `sanity.cli.ts`, `app/` (exceto `app/studio/`, que é apagado), `components/`, `lib/cn.ts`, `public/*`, `next.config.ts`, `postcss.config.mjs`, `eslint.config.mjs`, `tsconfig.json`, `proxy.ts`, `package.json`, `package-lock.json`, `.env.local`, `next-env.d.ts`, `tsconfig.tsbuildinfo`.
 
 ### Novos em `studio/`
-- `studio/package.json`, `studio/sanity.config.ts`, `studio/sanity.cli.ts` (com bloco `typegen` apontando para `../web`), `studio/tsconfig.json`, `studio/eslint.config.mjs`, `studio/.gitignore`, `studio/.env.example`, `studio/.env.local` (valores reais copiados do `.env.local` atual), `studio/static/.gitkeep`.
+- `studio/package.json`, `studio/sanity.config.ts`, `studio/sanity.cli.ts` (com bloco `typegen` apontando para `../web`), `studio/tsconfig.json`, `studio/eslint.config.mjs`, `studio/.gitignore`, `studio/.env.example`, `studio/.env.local` (só `SANITY_STUDIO_PROJECT_ID`/`SANITY_STUDIO_DATASET` — não são segredo, nenhum token entra aqui), `studio/static/.gitkeep`.
 - `studio/structure.ts` — lista customizada agrupando Courses, Lessons, Instructors, Categories.
 - `studio/schemaTypes/index.ts`, `studio/schemaTypes/documents/{course,lesson,instructor,category}.ts`, `studio/schemaTypes/objects/{module,outcome,resource}.ts`.
 
 ### Novos/movidos em `web/`
 - `web/app/**`, `web/components/**`, `web/lib/cn.ts`, `web/public/**` (conteúdo idêntico, só de caminho).
-- `web/next.config.ts`, `web/postcss.config.mjs`, `web/eslint.config.mjs`, `web/tsconfig.json` (exclude limpo), `web/proxy.ts`, `web/package.json` (dependências ajustadas — ver decisão 4), `web/.env.example`, `web/.env.local` (valores reais copiados).
+- `web/next.config.ts`, `web/postcss.config.mjs`, `web/eslint.config.mjs`, `web/tsconfig.json` (exclude limpo), `web/proxy.ts`, `web/package.json` (dependências ajustadas — ver decisão 4), `web/.env.example`, `web/.env.local` (Clerk + `NEXT_PUBLIC_SANITY_*` copiados do `.env.local` atual; `SANITY_API_READ_TOKEN` fica vazio até existir um token real — seção "Precisa da sua atenção").
 - `web/sanity/env.ts`, `web/sanity/lib/client.ts`, `web/sanity/lib/fetch.ts`, `web/sanity/lib/image.ts`, `web/sanity/lib/course-structure.ts`.
 - `web/sanity/queries/fragments.ts`, `web/sanity/queries/courses.ts`, `web/sanity/queries/lessons.ts`, `web/sanity/queries/instructors.ts`, `web/sanity/queries/categories.ts`.
 - `web/sanity.types.ts` (gerado pelo `typegen`, não escrito à mão).
@@ -90,7 +90,7 @@ Todos os documentos e objetos: `defineType`/`defineField`/`defineArrayMember`, �
 - `lib/course-structure.ts` — `findLessonPosition(modules, lessonId)` e `getModuleLabel(moduleNumber)`, funções puras que calculam `"Module 5"` / `"Lesson 5.1"` a partir da posição no array retornado pela query (nenhuma UI, nenhum I/O) — operacionaliza a regra "derivado da ordem, nunca armazenado" da seção 8 para quem for construir a página de aula depois.
 - `queries/fragments.ts` — `imageFragment`, `categoryFragment`, `instructorFragment`, `courseCardFragment`, `outcomeFragment`, `lessonSummaryFragment`, `resourceFragment`.
 - `queries/courses.ts` — `COURSES_QUERY` (catálogo), `COURSE_SLUGS_QUERY` (`generateStaticParams`), `COURSE_BY_SLUG_QUERY` (curso completo com módulos → aulas expandidas).
-- `queries/lessons.ts` — `LESSON_BY_SLUG_QUERY` (aula completa + curso pai via referência reversa `*[_type=="course" && references(^._id)][0]`, com os módulos em forma resumida para `course-structure.ts` calcular a posição), `LESSON_SLUGS_QUERY`.
+- `queries/lessons.ts` — `LESSON_BY_COURSE_AND_SLUG_QUERY` (aula completa + curso pai, ambos identificados por slug — ver "Fixes pós-revisão" no fim do arquivo — com os módulos em forma resumida para `course-structure.ts` calcular a posição), `COURSE_LESSON_SLUGS_QUERY`.
 - `queries/instructors.ts` — `INSTRUCTOR_BY_SLUG_QUERY` (instrutor + seus cursos via referência reversa).
 - `queries/categories.ts` — `CATEGORIES_QUERY`, `CATEGORY_BY_SLUG_QUERY`.
 
@@ -118,7 +118,7 @@ Todas as queries usam `defineQuery` de `next-sanity` com nomes únicos (exigênc
 - Nenhum arquivo dentro de `app/studio/` sobra na raiz; a rota `/studio` do Next.js deixa de existir.
 - Os 5 tipos da seção 8 (`course`, `module`, `lesson`, `instructor`, `category`) existem no `studio/schemaTypes`, com os campos fixos da seção 8 presentes e validação básica (`required()`) nos campos obrigatórios.
 - `web/sanity/lib/client.ts` e `web/sanity/lib/fetch.ts` importam `server-only` e nunca são importados por um arquivo com `'use client'`.
-- As 4 famílias de query (`courses`, `lessons`, `instructors`, `categories`) existem, tipam certo com `sanity.types.ts` gerado, e a query de aula resolve o curso pai por referência reversa.
+- As 4 famílias de query (`courses`, `lessons`, `instructors`, `categories`) existem, tipam certo com `sanity.types.ts` gerado, e a query de aula resolve o curso pai sem ambiguidade mesmo se a lesson for reaproveitada em mais de um curso (`LESSON_BY_COURSE_AND_SLUG_QUERY`, ver "Fixes pós-revisão").
 - `npx tsc --noEmit` limpo em `web/` e em `studio/`.
 - `npm run lint` limpo em `web/` e em `studio/`.
 - `npm run build` limpo em `web/` (rotas/páginas movidas continuam buildando) e `npm run build` (= `sanity build`) limpo em `studio/`.
@@ -135,10 +135,18 @@ Todas as queries usam `defineQuery` de `next-sanity` com nomes únicos (exigênc
 2. `cd studio && npm install && npm run dev` → abre `http://localhost:3333`; criar um `category`, um `instructor`, um `lesson` e um `course` referenciando os dois e contendo um `module` com essa lesson — confirmar que o preview de cada documento mostra título/subtítulo/mídia coerentes.
 3. Em outro terminal: `cd web && npm install && npm run dev` → abrir `http://localhost:3000/`, `/sign-in`, `/style-guide` e confirmar que continuam idênticos a antes da migração (nenhuma diferença visual, Clerk ainda funciona).
 4. Confirmar que `http://localhost:3000/studio` não existe mais (404).
-5. No `studio`, rodar `npm run typegen`; abrir `web/sanity.types.ts` e conferir que `COURSE_BY_SLUG_QUERY_RESULT`/`LESSON_BY_SLUG_QUERY_RESULT` etc. aparecem tipados.
-6. Escrever um script ad-hoc (ou usar o Vision plugin em `http://localhost:3333/vision`) rodando `COURSE_BY_SLUG_QUERY` com o slug do curso criado no passo 2 e confirmar que módulos → aulas vêm expandidos e que `findLessonPosition` (chamado manualmente com o resultado de `LESSON_BY_SLUG_QUERY`) devolve `"Lesson 1.1"`.
+5. No `studio`, rodar `npm run typegen`; abrir `web/sanity.types.ts` e conferir que `COURSE_BY_SLUG_QUERY_RESULT`/`LESSON_BY_COURSE_AND_SLUG_QUERY_RESULT` etc. aparecem tipados.
+6. Escrever um script ad-hoc (ou usar o Vision plugin em `http://localhost:3333/vision`) rodando `COURSE_BY_SLUG_QUERY` com o slug do curso criado no passo 2 e confirmar que módulos → aulas vêm expandidos e que `findLessonPosition` (chamado manualmente com o resultado de `LESSON_BY_COURSE_AND_SLUG_QUERY`) devolve `"Lesson 1.1"`.
 
 ## Precisa da sua atenção (depois de implementado)
 
 - Tornar o dataset `production` privado e criar um token de leitura (role "Viewer") no Sanity Manage, depois colocar em `web/.env.local` como `SANITY_API_READ_TOKEN`. Comando: `cd studio && npx sanity dataset visibility set production private` (exige `npx sanity login` antes). Sem isso, a leitura continua funcionando hoje (dataset ainda público), mas a seção 12 do AGENTS.md exige o dataset privado.
 - Depois que o Studio for deployado (`cd studio && npm run deploy`), adicionar a URL do `web` (local e produção) em CORS Origins do projeto Sanity — necessário mais adiante para o Context MCP (seção 12), não bloqueia este PR.
+
+## Fixes pós-revisão (comentários do CodeRabbit na PR #3)
+
+1. **`web/sanity/env.ts` aceitava string vazia**: `assertValue` só checava `v === undefined`; `NEXT_PUBLIC_SANITY_DATASET=""` passava e virava um identificador inválido em vez do erro declarado. Fix: `assertValue` agora tipa o parâmetro como `string | undefined`, faz `trim()` e rejeita qualquer valor falsy.
+2. **Ambiguidade em `LESSON_BY_COURSE_AND_SLUG_QUERY`** (antes `LESSON_BY_SLUG_QUERY`): nada no schema impede uma `lesson` ser referenciada por mais de um `course` (reaproveitamento de conteúdo), e a query resolvia o curso pai só por `*[_type=="course" && references(^._id)][0]` — com mais de um curso apontando pra mesma lesson, pegava um dos dois arbitrariamente, e `findLessonPosition` calcularia "Module X.Y" relativo ao curso errado. Fix: a query passou a exigir também `$courseSlug`, filtrando a lesson por pertencer a um módulo desse curso específico (`_id in *[_type=="course" && slug.current==$courseSlug][0].modules[].lessons[]._ref`) — sem consumidor ainda (nenhuma página usa essa query nesta PR), então trocar a assinatura não quebra nada. `LESSON_SLUGS_QUERY` virou `COURSE_LESSON_SLUGS_QUERY`, gerando pares curso→aulas a partir do lado do curso (fonte da verdade da relação) em vez de por referência reversa a partir da lesson, pela mesma razão.
+3. **Link morto no `README.md`**: `[JumpIn](https://github.com/)` apontava pra home do GitHub. Fix: aponta para o repositório real (`kellervmarcelo/jumpin_learning_plataform`).
+4. **`Pagination.tsx` não tratava `totalPages < 1`**: `getPageList` sempre incluía as páginas `1` e `total`, então com `total = 0` renderizava as páginas "0" e "1" como se fossem válidas. Fix: `getPageList` retorna lista vazia quando `total < 1`, e o componente agora clampa `currentPage` entre `1` e `totalPages` antes de usá-lo pra destacar a página atual, desabilitar os botões de anterior/próxima e disparar `onPageChange`. Esse componente só foi movido de pasta nesta PR (conteúdo já existia, veio de uma PR anterior), mas o fix é barato e isolado — não achei razão pra deixar passar.
+5. **Não corrigido — `web/app/page.tsx`, link "Courses"/"View all courses" sem rota `/courses`**: pré-existente (herdado de uma PR já mergeada, `app/page.tsx` só mudou de pasta aqui, conteúdo idêntico), e a home page em si está fora do escopo desta PR (schema + data layer, seção 2 dos "Fora de escopo"). Construir a página de catálogo é um trabalho de UI com imagem de referência (seção 3 do AGENTS.md), não algo pra encaixar de raspão numa PR de content model. Fica pendente para a tarefa da página de catálogo.

@@ -3,26 +3,22 @@ import { defineQuery } from 'next-sanity'
 import { categoryFragment, imageFragment, instructorFragment, resourceFragment } from './fragments'
 
 // Uma lesson não guarda o curso pai (seção 8 do AGENTS.md) — resolvido aqui
-// por referência reversa. `lessonIds` (as referências cruas de cada módulo,
-// sem expandir) é o que `findLessonPosition` (sanity/lib/course-structure.ts)
-// usa para calcular "Module X" / "Lesson X.Y" a partir da posição no array.
-const parentCourseFragment = /* groq */ `
-  "course": *[_type == "course" && references(^._id)][0]{
-    _id,
-    title,
-    "slug": slug.current,
-    "instructor": instructor->{ ${instructorFragment} },
-    "category": category->{ ${categoryFragment} },
-    "modules": modules[]{
-      _key,
-      title,
-      "lessonIds": lessons[]._ref
-    }
-  }
-`
-
-export const LESSON_BY_SLUG_QUERY = defineQuery(/* groq */ `
-  *[_type == "lesson" && slug.current == $slug][0]{
+// por referência reversa. Nada no schema impede uma mesma lesson ser
+// referenciada por mais de um módulo/curso (reaproveitamento de conteúdo),
+// então resolver só pelo slug da lesson (`*[_type=="course" &&
+// references(^._id)][0]`) poderia pegar o curso errado. Por isso a query
+// exige também o slug do curso: a lesson só resolve se pertencer a um
+// módulo desse curso específico, e a numeração ("Module X"/"Lesson X.Y",
+// calculada por `findLessonPosition` em sanity/lib/course-structure.ts) fica
+// sempre relativa ao curso pedido — o mesmo curso que a página de aula
+// recebe na própria URL (`/courses/[courseSlug]/lessons/[lessonSlug]`,
+// quando essa rota existir).
+export const LESSON_BY_COURSE_AND_SLUG_QUERY = defineQuery(/* groq */ `
+  *[
+    _type == "lesson" &&
+    slug.current == $lessonSlug &&
+    _id in *[_type == "course" && slug.current == $courseSlug][0].modules[].lessons[]._ref
+  ][0]{
     _id,
     title,
     "slug": slug.current,
@@ -35,10 +31,27 @@ export const LESSON_BY_SLUG_QUERY = defineQuery(/* groq */ `
     keyPoints,
     proTip,
     "resources": resources[]{ ${resourceFragment} },
-    ${parentCourseFragment}
+    "course": *[_type == "course" && slug.current == $courseSlug][0]{
+      _id,
+      title,
+      "slug": slug.current,
+      "instructor": instructor->{ ${instructorFragment} },
+      "category": category->{ ${categoryFragment} },
+      "modules": modules[]{
+        _key,
+        title,
+        "lessonIds": lessons[]._ref
+      }
+    }
   }
 `)
 
-export const LESSON_SLUGS_QUERY = defineQuery(/* groq */ `
-  *[_type == "lesson" && defined(slug.current)]{ "slug": slug.current }
+// Pares (courseSlug, lessonSlug) para gerar as rotas estáticas de aula —
+// derivados do lado do curso (fonte da verdade da relação), nunca por
+// referência reversa a partir da lesson, pela mesma razão acima.
+export const COURSE_LESSON_SLUGS_QUERY = defineQuery(/* groq */ `
+  *[_type == "course" && defined(slug.current)]{
+    "courseSlug": slug.current,
+    "lessonSlugs": modules[].lessons[]->slug.current
+  }
 `)

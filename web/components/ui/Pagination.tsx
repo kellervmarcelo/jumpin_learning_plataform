@@ -11,6 +11,8 @@ export type PaginationProps = {
 };
 
 function getPageList(current: number, total: number): Array<number | "ellipsis"> {
+  if (total < 1) return [];
+
   const pages = new Set<number>([1, total]);
   for (let page = current - 1; page <= current + 1; page += 1) {
     if (page >= 1 && page <= total) pages.add(page);
@@ -29,7 +31,8 @@ function getPageList(current: number, total: number): Array<number | "ellipsis">
 
 // 13 — Navigation: Pagination.
 export function Pagination({ currentPage, totalPages, onPageChange, className }: PaginationProps) {
-  const pages = getPageList(currentPage, totalPages);
+  const clampedPage = Math.min(Math.max(currentPage, 1), Math.max(totalPages, 1));
+  const pages = getPageList(clampedPage, totalPages);
 
   const buttonBase =
     "inline-flex h-9 min-w-9 items-center justify-center rounded-md px-2 type-small font-medium transition-colors " +
@@ -41,8 +44,8 @@ export function Pagination({ currentPage, totalPages, onPageChange, className }:
       <button
         type="button"
         className={cn(buttonBase, "text-neutral-500 hover:bg-neutral-100")}
-        onClick={() => onPageChange(currentPage - 1)}
-        disabled={currentPage <= 1}
+        onClick={() => onPageChange(clampedPage - 1)}
+        disabled={clampedPage <= 1}
         aria-label="Página anterior"
       >
         <CaretLeftIcon size={16} aria-hidden="true" />
@@ -57,10 +60,10 @@ export function Pagination({ currentPage, totalPages, onPageChange, className }:
           <button
             key={page}
             type="button"
-            aria-current={page === currentPage ? "page" : undefined}
+            aria-current={page === clampedPage ? "page" : undefined}
             className={cn(
               buttonBase,
-              page === currentPage
+              page === clampedPage
                 ? "border border-primary-500 text-primary-500"
                 : "text-neutral-700 hover:bg-neutral-100",
             )}
@@ -74,8 +77,8 @@ export function Pagination({ currentPage, totalPages, onPageChange, className }:
       <button
         type="button"
         className={cn(buttonBase, "text-neutral-500 hover:bg-neutral-100")}
-        onClick={() => onPageChange(currentPage + 1)}
-        disabled={currentPage >= totalPages}
+        onClick={() => onPageChange(clampedPage + 1)}
+        disabled={clampedPage >= totalPages}
         aria-label="Próxima página"
       >
         <CaretRightIcon size={16} aria-hidden="true" />

@@ -1,4 +1,4 @@
-This is [JumpIn](https://github.com/), an AI-powered learning platform. See [AGENTS.md](./AGENTS.md) for the full product and architecture spec.
+This is [JumpIn](https://github.com/kellervmarcelo/jumpin_learning_plataform), an AI-powered learning platform. See [AGENTS.md](./AGENTS.md) for the full product and architecture spec.
 
 ## Project structure
 
