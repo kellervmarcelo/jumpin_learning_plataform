@@ -1,36 +1,31 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+This is [JumpIn](https://github.com/), an AI-powered learning platform. See [AGENTS.md](./AGENTS.md) for the full product and architecture spec.
 
-## Getting Started
+## Project structure
 
-First, run the development server:
+Two standalone workspaces in one repo (no npm/pnpm workspace linking — each has its own `package.json` and `node_modules`):
+
+- `studio/` — Sanity Studio (content schema and authoring). Runs on Vite, independent of the Next.js app.
+- `web/` — the Next.js app (App Router): pages, search UI, Clerk auth, and all server-side integration.
+
+## Getting started
+
+Copy each workspace's `.env.example` to `.env.local` and fill in the values, then run both dev servers side by side, in separate terminals:
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+cd studio && npm install && npm run dev   # http://localhost:3333
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+```bash
+cd web && npm install && npm run dev      # http://localhost:3000
+```
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+After changing the schema or a GROQ query, regenerate `web/sanity.types.ts`:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+cd studio && npm run typegen
+```
 
 ## Learn More
 
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- [Next.js Documentation](https://nextjs.org/docs)
+- [Sanity Documentation](https://www.sanity.io/docs)
